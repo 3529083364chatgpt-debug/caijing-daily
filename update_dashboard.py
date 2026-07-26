@@ -100,15 +100,11 @@ def upload(html, retries=5):
         return urllib.request.urlopen(req, timeout=120)
 
     sha = None
-    for a in range(1, 6):
-        try:
-            cur = json.loads(api("GET", f"https://api.github.com/repos/{REPO}/contents/index.html").read())
-            sha = cur["sha"]
-            break
-        except Exception as e:
-            print("  get-sha retry", a, repr(e)[:80]); time.sleep(3)
-    if not sha:
-        raise RuntimeError("cannot fetch current file sha")
+    try:
+        cur = json.loads(api("GET", f"https://api.github.com/repos/{REPO}/contents/index.html").read())
+        sha = cur["sha"]
+    except Exception as e:
+        print("  [upload] index.html not present yet, will create:", repr(e)[:60])
 
     b64 = base64.b64encode(html.encode("utf-8")).decode()
     body = json.dumps({
