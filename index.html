@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财经三板块日报仪表盘</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --panel:#ffffff; --ink:#1f2330; --muted:#6b7280;
+    --line:#e8eaf0; --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.06);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+  /* Hero */
+  .hero{background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 48%,#0ea5e9 100%);color:#fff;padding:34px 0 26px;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;inset:0;background:
+    radial-gradient(600px 200px at 85% -10%,rgba(255,255,255,.18),transparent),
+    radial-gradient(400px 200px at 10% 120%,rgba(255,255,255,.12),transparent)}
+  .hero .wrap{position:relative;z-index:1}
+  .eyebrow{font-size:13px;letter-spacing:.18em;text-transform:uppercase;opacity:.85;font-weight:600}
+  .hero h1{font-size:clamp(26px,4.6vw,42px);font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
+  .hero .meta{opacity:.92;font-size:14px;margin-top:6px}
+  .hero .meta b{font-weight:700}
+  .stats{display:grid;grid-template-columns:1.1fr repeat(5,1fr);gap:12px;margin-top:22px}
+  .stat{background:rgba(255,255,255,.14);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.22);
+    border-radius:14px;padding:14px 12px;text-align:center}
+  .stat.total .num{font-size:40px}
+  .stat .num{font-size:30px;font-weight:800;line-height:1}
+  .stat .lbl{font-size:12px;opacity:.9;margin-top:6px;line-height:1.35}
+  .stat .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+
+  /* Controls bar */
+  .controls{position:sticky;top:0;z-index:25;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);box-shadow:0 2px 10px rgba(16,24,40,.04)}
+  .controls .wrap{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 20px}
+  .tabs{display:inline-flex;background:#eef1f7;border-radius:12px;padding:4px}
+  .tabs button{border:0;background:transparent;font:inherit;font-weight:700;font-size:14px;color:var(--muted);
+    padding:8px 16px;border-radius:9px;cursor:pointer;transition:.15s}
+  .tabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(16,24,40,.12)}
+  .navbtns{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 13px;font:inherit;font-size:13px;
+    font-weight:600;color:var(--ink);cursor:pointer;transition:.15s}
+  .btn:hover{border-color:#cbd2e0;background:#fafbff}
+  .btn.primary{background:#4f46e5;border-color:#4f46e5;color:#fff}
+  .btn.primary:hover{filter:brightness(1.05)}
+  select.date{font:inherit;font-size:13px;font-weight:600;padding:7px 10px;border:1px solid var(--line);
+    border-radius:9px;background:#fff;color:var(--ink);cursor:pointer;max-width:220px}
+  .rangetag{font-size:13px;color:var(--muted);font-weight:600;margin-left:auto}
+
+  /* Section nav */
+  .nav{position:sticky;top:57px;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line)}
+  .nav .wrap{display:flex;gap:8px;overflow-x:auto;padding:10px 20px;scrollbar-width:none}
+  .nav .wrap::-webkit-scrollbar{display:none}
+  .nav a{flex:0 0 auto;text-decoration:none;font-size:13px;font-weight:600;color:var(--muted);
+    padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:#fff;white-space:nowrap;transition:.15s}
+  .nav a:hover{color:var(--ink);border-color:#cbd2e0}
+  .nav a .c{display:inline-block;min-width:20px;text-align:center;margin-left:6px;font-size:11px;
+    background:#eef1f7;color:#475069;border-radius:999px;padding:0 6px}
+
+  /* Leads panel */
+  .leads{margin:26px 0 4px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 20px;box-shadow:var(--shadow)}
+  .leads h3{font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .leads ol{list-style:none;display:grid;gap:10px}
+  .leads li{display:flex;gap:12px;align-items:baseline;padding-bottom:10px;border-bottom:1px dashed var(--line)}
+  .leads li:last-child{border-bottom:0;padding-bottom:0}
+  .leads .ld{font-size:12px;font-weight:700;color:#fff;background:#7c3aed;border-radius:7px;padding:2px 8px;white-space:nowrap}
+  .leads .lt{font-size:14px;font-weight:600}
+  .leads .lp{font-size:12.5px;color:var(--muted);margin-top:2px}
+
+  /* Sections */
+  section.block{padding:30px 0 8px;scroll-margin-top:118px}
+  .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .sec-head .ic{font-size:24px}
+  .sec-head h2{font-size:21px;font-weight:800;letter-spacing:-.3px}
+  .sec-head .badge{margin-left:auto;font-size:13px;font-weight:700;color:#fff;border-radius:999px;padding:3px 12px}
+  .sec-head .rule{flex:1;height:1px;background:var(--line)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;
+    box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;transition:transform .15s,box-shadow .15s}
+  .card:hover{transform:translateY(-3px);box-shadow:0 4px 10px rgba(16,24,40,.06),0 16px 36px rgba(16,24,40,.10)}
+  .card .top{display:flex;align-items:center;gap:10px}
+  .num{flex:0 0 auto;width:30px;height:30px;border-radius:9px;color:#fff;font-weight:800;font-size:14px;
+    display:flex;align-items:center;justify-content:center}
+  .chip{font-size:12px;font-weight:600;color:#475069;background:#eef1f7;border-radius:999px;padding:3px 10px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .card h3{font-size:15.5px;font-weight:700;line-height:1.45}
+  .card p{font-size:13.5px;color:#475069;line-height:1.6}
+  .card .go{margin-top:auto;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;
+    text-decoration:none;align-self:flex-start;padding:7px 13px;border-radius:10px;background:#f3f4f8;transition:.15s}
+  .card .go:hover{filter:brightness(.97)}
+  .empty{grid-column:1/-1;background:#fff;border:1px dashed var(--line);border-radius:var(--radius);padding:28px;
+    text-align:center;color:var(--muted);font-size:14px}
+
+  footer{margin-top:34px;padding:24px 0 40px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+  footer .wrap{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;justify-content:space-between}
+  .totpill{font-weight:800;color:var(--ink)}
+  #top{position:fixed;right:20px;bottom:22px;width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;
+    background:#4f46e5;color:#fff;font-size:20px;box-shadow:0 8px 22px rgba(79,70,229,.4);opacity:0;pointer-events:none;transition:.2s;z-index:30}
+  #top.show{opacity:1;pointer-events:auto}
+  @media(max-width:760px){
+    .stats{grid-template-columns:repeat(3,1fr)}
+    .stat.total{grid-column:1/-1}
+    .rangetag{margin-left:0;width:100%}
+    .nav{top:113px}
+  }
+</style>
+</head>
+<body>
+  <header class="hero"><div class="wrap">
+    <div class="eyebrow">财经日报 · 每日 / 每周 / 每月（股市 / 金融 / 互联网）</div>
+    <h1 id="hTitle">—</h1>
+    <div class="meta" id="hMeta">—</div>
+    <div class="stats" id="stats"></div>
+  </div></header>
+
+  <div class="controls"><div class="wrap">
+    <div class="tabs" id="tabs">
+      <button data-mode="day" class="on">日报</button>
+      <button data-mode="week">周报</button>
+      <button data-mode="month">月报</button>
+    </div>
+    <div class="navbtns" id="navbtns"></div>
+    <span class="rangetag" id="rangetag"></span>
+  </div></div>
+
+  <nav class="nav"><div class="wrap" id="nav"></div></nav>
+
+  <main class="wrap" id="main"></main>
+
+  <footer><div class="wrap">
+    <span>本视图共 <span class="totpill" id="footTotal"></span> 条 · 数据源：<span id="footSrc"></span></span>
+    <span id="footCov"></span>
+  </div></footer>
+
+  <button id="top" title="返回顶部">↑</button>
+
+<script>
+const DB = {"start":"2026-07-26","end":"2026-07-26","days":{"2026-07-26":{"lead":{"t":"今日市场焦点：2.1万亿逆回购预告维稳资金面，宁德时代抛A股史上最大注销式回购","p":"央行预告7月末至8月初合计2.1万亿逆回购对冲缴款压力；宁德时代中报净利+42%并抛出200-400亿注销式回购；主要指数上周集体调整。"},"s":{"股市":[{"t":"央行预告7月29-31日每日6000亿逆回购 合计2.1万亿","s":"对冲月末地方债与特别国债缴款压力，资金面'适度宽松'定调不变，利好大金融与成长股","src":"市场消息汇总","u":"https://baijiahao.baidu.com/s?id=1871757659284182228"},{"t":"宁德时代抛200-400亿注销式回购 A股史上最大单次","s":"中报净利+42%，叠加中期分红65亿，全部注销式回购","src":"市场消息汇总","u":"https://baijiahao.baidu.com/s?id=1871757659284182228"},{"t":"上周全球市场调整 上证指数收3814.20跌1.61%","s":"深证成指跌2.47%、创业板指跌2.65%、沪深300跌1.67%、恒生指数跌0.98%","src":"中国网财经","u":"http://finance.china.com.cn/"},{"t":"锂电池核心添加剂价格1月涨超4成","s":"今年市场规模预计增长51%，相关产业链受关注","src":"东方财富","u":"https://stock.eastmoney.com/a/cscsj.html"},{"t":"台风'红霞'登陆广东 多部门支持灾后应急恢复","s":"相关部门出台措施支持广东台风灾害灾后应急恢复","src":"东方财富","u":"https://finance.eastmoney.com/?category=10007"}],"金融":[{"t":"央行7月24日开展5000亿元MLF操作 加量1000亿","s":"连续第三个月加量续作，叠加买断式逆回购，当月中期流动性操作合计放量","src":"新浪财经","u":"https://finance.sina.com.cn/roll/2026-07-25/doc-iniizkxf1080121.shtml"},{"t":"央行明确持续实施适度宽松货币政策","s":"加大逆周期、跨周期调节，保持流动性充裕，灵活运用逆回购、MLF、降准工具","src":"新浪财经","u":"https://k.sina.cn/article_7879776490_1d5abd8ea0680198a8.html"},{"t":"国新办发布会介绍上半年货币政策执行与金融统计数据","s":"央行副行长邹澜出席，解读上半年金融支持实体经济成效","src":"央广网","u":"https://news.cnr.cn/native/gd/20260715/t20260715_527711780.shtml"},{"t":"上半年货币政策支持实体经济效果明显","s":"金融统计数据反映社会综合融资成本稳中有降","src":"央广网","u":"https://news.cnr.cn/native/gd/20260715/t20260715_527711780.shtml"}],"互联网":[{"t":"OpenAI发布GPT-5.6（太阳系系列）模型","s":"并行多子Agent推理能力刷新行业榜单，但受海外监管政策限制","src":"雪球","u":"https://xueqiu.com/1077174092/399462752"},{"t":"谷歌发布Nano Banana 2 Lite（Gemini 3.1 Flash-Lite）图像模型","s":"轻量级图像生成模型面向更广场景落地","src":"雪球","u":"https://xueqiu.com/1077174092/397730375"},{"t":"国产万亿模型开源 AI智能体能力突破","s":"中国开源大模型以低成本+可微调优势反向渗透海外科技巨头基础设施","src":"CSDN","u":"https://blog.csdn.net/agito_cheung/article/details/162587564"},{"t":"Sapiens AI 核心全模态模型 Agnes AI 面向全球免费开放","s":"面向全球开发者和创作者无限期免费","src":"10100.com","u":"https://www.10100.com/article/149129791"},{"t":"国常会人工智能产业扶持政策落地 万卡级智算中心配套","s":"加大高端芯片、存储材料研发补贴与税收减免，开放政企场景","src":"无矩AI","u":"https://iaipie.com/2026-%E5%B9%B4-7-%E6%9C%88-1-%E6%97%A5-ai-%E8%A1%8C%E4%B8%9A%E8%B5%84%E8%AE%AF%E9%80%9F%E8%A7%88/"},{"t":"DeepSeek V4 与 Kimi K2.6 相继发布 国产大模型技术拐点","s":"2026年一季度国产大模型迎来历史性技术拐点，长上下文处理能力跃升","src":"腾讯云","u":"https://cloud.tencent.cn/developer/article/2672179"}]}}}};
+const SECTIONS = ["股市","金融","互联网"];
+const ICON = {"股市":"📈","金融":"🏦","互联网":"💻"};
+const ACCENT = {"股市":"#e11d48","金融":"#059669","互联网":"#2563eb"};
+const DATES = Object.keys(DB.days).sort();
+const esc = s => (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let state = { mode:"day", cursor: DB.end };
+
+/* ---- date helpers ---- */
+function parse(d){const [y,m,a]=d.split("-").map(Number);return new Date(y,m-1,a);}
+function ymd(dt){return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");}
+function fmtCn(d){const dt=parse(d);return dt.getFullYear()+"年"+(dt.getMonth()+1)+"月"+dt.getDate()+"日";}
+function wkCN(d){return "星期"+"日一二三四五六"[parse(d).getDay()];}
+function addDays(d,n){const dt=parse(d);dt.setDate(dt.getDate()+n);return ymd(dt);}
+function mondayOf(d){const dt=parse(d);const wd=dt.getDay();const diff=(wd+6)%7;const m=new Date(dt);m.setDate(dt.getDate()-diff);return ymd(m);}
+function isoWeek(d){const dt=parse(d);const t=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()-day+3);const firstThu=new Date(Date.UTC(t.getUTCFullYear(),0,4));const wk=1+Math.round((t-firstThu)/86400000/7);return {year:t.getUTCFullYear(),wk};}
+function emptySections(){const o={};SECTIONS.forEach(l=>o[l]=[]);return o;}
+function count(s){return SECTIONS.reduce((a,l)=>a+s[l].length,0);}
+function merge(days){
+  const out=emptySections();const seen=new Set();
+  days.forEach(d=>{const day=DB.days[d];if(!day)return;SECTIONS.forEach(l=>{
+    (day.s[l]||[]).forEach(it=>{if(!seen.has(it.t)){seen.add(it.t);out[l].push(it);}});
+  });});
+  return out;
+}
+
+/* ---- view computation ---- */
+function getView(){
+  if(state.mode==="day"){
+    const d=state.cursor, day=DB.days[d];
+    const s = day?day.s:emptySections();
+    return {title:fmtCn(d)+" "+wkCN(d), sub:"当日 AI HOT 精选日报", secs:s,
+            leads: (day&&day.lead)?[day.lead]:[], total:count(s), kind:"day"};
+  }
+  if(state.mode==="week"){
+    const mon=mondayOf(state.cursor); const ds=[];
+    for(let i=0;i<7;i++){const dd=addDays(mon,i);if(DB.days[dd])ds.push(dd);}
+    const m=merge(ds); const {year,wk}=isoWeek(mon);
+    const leads=ds.map(dd=>DB.days[dd].lead).filter(Boolean);
+    return {title:year+"年 第"+wk+"周", sub:fmtCn(mon)+" – "+fmtCn(addDays(mon,6))+"（含 "+ds.length+" 期日报）",
+            secs:m, leads, total:count(m), kind:"week"};
+  }
+  const dt=parse(state.cursor), y=dt.getFullYear(), mo=dt.getMonth()+1;
+  const pfx=y+"-"+String(mo).padStart(2,"0");
+  const ds=DATES.filter(d=>d.startsWith(pfx));
+  const m=merge(ds);
+  const leads=ds.map(dd=>DB.days[dd].lead).filter(Boolean);
+  return {title:y+"年"+mo+"月", sub:"本月共 "+ds.length+" 期日报精选合集", secs:m, leads, total:count(m), kind:"month"};
+}
+
+/* ---- render ---- */
+function render(){
+  const v=getView();
+  document.getElementById("hTitle").textContent=v.title;
+  document.getElementById("hMeta").textContent=v.sub;
+  let sh='<div class="stat total"><div class="num">'+v.total+'</div><div class="lbl">本视图总条数</div></div>';
+  SECTIONS.forEach(l=>{sh+='<div class="stat"><div class="num" style="color:'+ACCENT[l]+'">'+v.secs[l].length+'</div><div class="lbl"><span class="dot" style="background:'+ACCENT[l]+'"></span>'+esc(l)+'</div></div>';});
+  document.getElementById("stats").innerHTML=sh;
+  renderControls();
+  let nh="";SECTIONS.forEach((l,i)=>{nh+='<a href="#sec-'+i+'" data-i="'+i+'">'+ICON[l]+" "+esc(l)+'<span class="c">'+v.secs[l].length+'</span></a>';});
+  document.getElementById("nav").innerHTML=nh;
+  let n=0;SECTIONS.forEach(l=>{v.secs[l].forEach(it=>{it.n=++n;});});
+  let body="";
+  if(v.leads&&v.leads.length){
+    body+='<div class="leads"><h3>📌 本期头条</h3><ol>';
+    v.leads.forEach(ld=>{body+='<li><span class="ld">头条</span><div><div class="lt">'+esc(ld.t)+'</div>'+(ld.p?'<div class="lp">'+esc(ld.p)+'</div>':'')+'</div></li>';});
+    body+='</ol></div>';
+  }
+  SECTIONS.forEach((l,i)=>{
+    const items=v.secs[l];let cards;
+    if(!items.length){cards='<div class="empty">本版块本期暂无条目</div>';}
+    else{
+      cards='<div class="grid">';
+      items.forEach(it=>{cards+='<article class="card"><div class="top"><span class="num" style="background:'+ACCENT[l]+'">'+it.n+'</span><span class="chip" title="'+esc(it.src)+'">'+esc(it.src)+'</span></div><h3>'+esc(it.t)+'</h3>'+(it.s?'<p>'+esc(it.s)+'</p>':'')+'<a class="go" style="color:'+ACCENT[l]+'" href="'+esc(it.u)+'" target="_blank" rel="noopener noreferrer">阅读原文 →</a></article>';});
+      cards+='</div>';
+    }
+    body+='<section class="block" id="sec-'+i+'"><div class="sec-head"><span class="ic">'+ICON[l]+'</span><h2>'+esc(l)+'</h2><span class="rule"></span><span class="badge" style="background:'+ACCENT[l]+'">'+items.length+' 条</span></div>'+cards+'</section>';
+  });
+  document.getElementById("main").innerHTML=body;
+  document.getElementById("footTotal").textContent=v.total;
+  document.getElementById("footSrc").textContent="权威财经媒体 / 交易所 / 监管机构 多元聚合";
+  document.getElementById("footCov").textContent="数据覆盖 "+DB.start+" ~ "+DB.end+"（共 "+DATES.length+" 期日报，已内嵌）";
+  initObserver();
+}
+
+function renderControls(){
+  const nb=document.getElementById("navbtns");const tag=document.getElementById("rangetag");
+  let html="";
+  if(state.mode==="day"){
+    const i=DATES.indexOf(state.cursor);
+    html+='<button class="btn" id="prev">‹ 上一天</button>';
+    html+='<select class="date" id="pick">';
+    DATES.slice().reverse().forEach(d=>{html+='<option value="'+d+'"'+(d===state.cursor?' selected':'')+'>'+fmtCn(d)+" "+wkCN(d)+'</option>';});
+    html+='</select>';
+    html+='<button class="btn" id="next">下一天 ›</button>';
+    html+='<button class="btn primary" id="latest">最新</button>';
+    tag.textContent="日报模式：从下方选择任意日期查看当日精选";
+  }else if(state.mode==="week"){
+    html+='<button class="btn" id="prev">‹ 上一周</button>';
+    html+='<button class="btn" id="next">下一周 ›</button>';
+    html+='<button class="btn primary" id="latest">最近一周</button>';
+    const mon=mondayOf(state.cursor);tag.textContent="周报模式：合并该周各日报精选（"+fmtCn(mon)+" 起）";
+  }else{
+    html+='<button class="btn" id="prev">‹ 上个月</button>';
+    html+='<button class="btn" id="next">下个月 ›</button>';
+    html+='<button class="btn primary" id="latest">最近一月</button>';
+    const dt=parse(state.cursor);tag.textContent="月报模式：合并当月各日报精选（"+dt.getFullYear()+"年"+(dt.getMonth()+1)+"月）";
+  }
+  nb.innerHTML=html;
+  const prev=document.getElementById("prev"),next=document.getElementById("next"),latest=document.getElementById("latest");
+  if(state.mode==="day"){
+    prev.onclick=()=>{const i=DATES.indexOf(state.cursor);if(i>0)state.cursor=DATES[i-1];render();window.scrollTo({top:0,behavior:"smooth"});};
+    next.onclick=()=>{const i=DATES.indexOf(state.cursor);if(i<DATES.length-1)state.cursor=DATES[i+1];render();window.scrollTo({top:0,behavior:"smooth"});};
+    document.getElementById("pick").onchange=e=>{state.cursor=e.target.value;render();};
+  }else if(state.mode==="week"){
+    prev.onclick=()=>{state.cursor=addDays(mondayOf(state.cursor),-7);render();window.scrollTo({top:0,behavior:"smooth"});};
+    next.onclick=()=>{state.cursor=addDays(mondayOf(state.cursor),7);render();window.scrollTo({top:0,behavior:"smooth"});};
+  }else{
+    const dt=parse(state.cursor);const nd=new Date(dt.getFullYear(),dt.getMonth()-1,1);prev.onclick=()=>{state.cursor=ymd(nd);render();window.scrollTo({top:0,behavior:"smooth"});};
+    const nd2=new Date(dt.getFullYear(),dt.getMonth()+1,1);next.onclick=()=>{state.cursor=ymd(nd2);render();window.scrollTo({top:0,behavior:"smooth"});};
+  }
+  latest.onclick=()=>{state.cursor=DB.end;render();window.scrollTo({top:0,behavior:"smooth"});};
+}
+
+document.querySelectorAll("#tabs button").forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll("#tabs button").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");state.mode=b.dataset.mode;render();window.scrollTo({top:0,behavior:"smooth"});
+  };
+});
+
+let obs=null;
+function initObserver(){
+  if(obs)obs.disconnect();
+  const links=[...document.querySelectorAll("#nav a")];
+  function onIntersect(es){es.forEach(function(e){if(e.isIntersecting){var i=e.target.id.split("-")[1];
+    links.forEach(function(a){var on=a.dataset.i===i;a.style.background=on?ACCENT[SECTIONS[i]]:"transparent";a.style.borderColor=on?"transparent":"var(--line)";a.style.color=on?"#fff":"var(--muted)";});}});}
+  obs=new IntersectionObserver(onIntersect,{rootMargin:"-45% 0px -50% 0px"});
+  SECTIONS.forEach((l,i)=>obs.observe(document.getElementById("sec-"+i)));
+}
+
+const topBtn=document.getElementById("top");
+window.addEventListener("scroll",()=>topBtn.classList.toggle("show",window.scrollY>400));
+topBtn.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));
+
+render();
+</script>
+</body>
+</html>
