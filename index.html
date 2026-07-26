@@ -6,9 +6,9 @@
 <title>财经三板块日报仪表盘</title>
 <style>
   :root{
-    --bg:#f6f7fb; --panel:#ffffff; --ink:#1f2330; --muted:#6b7280;
-    --line:#e8eaf0; --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.06);
-    --radius:16px;
+    --bg:#f3f4f8; --panel:#ffffff; --ink:#15171c; --muted:#6b7280;
+    --line:#e9ebf1; --shadow:0 1px 3px rgba(16,24,40,.05),0 14px 34px rgba(16,24,40,.09);
+    --radius:18px; --ac:#4f46e5;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -18,22 +18,23 @@
   .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
 
   /* Hero */
-  .hero{background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 48%,#0ea5e9 100%);color:#fff;padding:34px 0 26px;position:relative;overflow:hidden}
+  .hero{background:linear-gradient(135deg,#3730a3 0%,#6d28d9 46%,#0ea5e9 100%);color:#fff;padding:40px 0 30px;position:relative;overflow:hidden}
   .hero::after{content:"";position:absolute;inset:0;background:
-    radial-gradient(600px 200px at 85% -10%,rgba(255,255,255,.18),transparent),
-    radial-gradient(400px 200px at 10% 120%,rgba(255,255,255,.12),transparent)}
+    radial-gradient(620px 240px at 88% -20%,rgba(255,255,255,.22),transparent),
+    radial-gradient(480px 260px at 6% 130%,rgba(255,255,255,.14),transparent)}
   .hero .wrap{position:relative;z-index:1}
-  .eyebrow{font-size:13px;letter-spacing:.18em;text-transform:uppercase;opacity:.85;font-weight:600}
-  .hero h1{font-size:clamp(26px,4.6vw,42px);font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
-  .hero .meta{opacity:.92;font-size:14px;margin-top:6px}
+  .eyebrow{font-size:13px;letter-spacing:.2em;text-transform:uppercase;opacity:.9;font-weight:700}
+  .hero h1{font-size:clamp(28px,5vw,46px);font-weight:800;margin:8px 0 6px;letter-spacing:-.6px}
+  .hero .meta{opacity:.94;font-size:15px;margin-top:8px}
   .hero .meta b{font-weight:700}
-  .stats{display:grid;grid-template-columns:1.1fr repeat(5,1fr);gap:12px;margin-top:22px}
-  .stat{background:rgba(255,255,255,.14);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.22);
-    border-radius:14px;padding:14px 12px;text-align:center}
-  .stat.total .num{font-size:40px}
+  .stats{display:grid;grid-template-columns:1.1fr repeat(5,1fr);gap:12px;margin-top:24px}
+  .stat{background:rgba(255,255,255,.16);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.28);
+    border-radius:16px;padding:16px 12px;text-align:center;transition:transform .2s,background .2s}
+  .stat:hover{transform:translateY(-3px);background:rgba(255,255,255,.24)}
+  .stat.total .num{font-size:42px}
   .stat .num{font-size:30px;font-weight:800;line-height:1}
-  .stat .lbl{font-size:12px;opacity:.9;margin-top:6px;line-height:1.35}
-  .stat .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  .stat .lbl{font-size:12px;opacity:.92;margin-top:7px;line-height:1.35}
+  .stat .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle}
 
   /* Controls bar */
   .controls{position:sticky;top:0;z-index:25;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
@@ -80,12 +81,12 @@
   .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
   .sec-head .ic{font-size:24px}
   .sec-head h2{font-size:21px;font-weight:800;letter-spacing:-.3px}
-  .sec-head .badge{margin-left:auto;font-size:13px;font-weight:700;color:#fff;border-radius:999px;padding:3px 12px}
+  .sec-head .badge{margin-left:auto;font-size:13px;font-weight:700;color:#fff;border-radius:999px;padding:4px 14px;box-shadow:0 4px 12px rgba(16,24,40,.18)}
   .sec-head .rule{flex:1;height:1px;background:var(--line)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;
-    box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;transition:transform .15s,box-shadow .15s}
-  .card:hover{transform:translateY(-3px);box-shadow:0 4px 10px rgba(16,24,40,.06),0 16px 36px rgba(16,24,40,.10)}
+  .card{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--ac,#4f46e5);border-radius:var(--radius);padding:18px 20px;
+    box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;transition:transform .18s,box-shadow .18s}
+  .card:hover{transform:translateY(-4px);box-shadow:0 6px 14px rgba(16,24,40,.07),0 22px 46px rgba(16,24,40,.13)}
   .card .top{display:flex;align-items:center;gap:10px}
   .num{flex:0 0 auto;width:30px;height:30px;border-radius:9px;color:#fff;font-weight:800;font-size:14px;
     display:flex;align-items:center;justify-content:center}
@@ -175,7 +176,7 @@ function getView(){
   if(state.mode==="day"){
     const d=state.cursor, day=DB.days[d];
     const s = day?day.s:emptySections();
-    return {title:fmtCn(d)+" "+wkCN(d), sub:"当日 AI HOT 精选日报", secs:s,
+    return {title:fmtCn(d)+" "+wkCN(d), sub:"当日财经精选日报", secs:s,
             leads: (day&&day.lead)?[day.lead]:[], total:count(s), kind:"day"};
   }
   if(state.mode==="week"){
@@ -217,7 +218,7 @@ function render(){
     if(!items.length){cards='<div class="empty">本版块本期暂无条目</div>';}
     else{
       cards='<div class="grid">';
-      items.forEach(it=>{cards+='<article class="card"><div class="top"><span class="num" style="background:'+ACCENT[l]+'">'+it.n+'</span><span class="chip" title="'+esc(it.src)+'">'+esc(it.src)+'</span></div><h3>'+esc(it.t)+'</h3>'+(it.s?'<p>'+esc(it.s)+'</p>':'')+'<a class="go" style="color:'+ACCENT[l]+'" href="'+esc(it.u)+'" target="_blank" rel="noopener noreferrer">阅读原文 →</a></article>';});
+      items.forEach(it=>{cards+='<article class="card" style="--ac:'+ACCENT[l]+'"><div class="top"><span class="num" style="background:'+ACCENT[l]+'">'+it.n+'</span><span class="chip" title="'+esc(it.src)+'">'+esc(it.src)+'</span></div><h3>'+esc(it.t)+'</h3>'+(it.s?'<p>'+esc(it.s)+'</p>':'')+'<a class="go" style="color:'+ACCENT[l]+'" href="'+esc(it.u)+'" target="_blank" rel="noopener noreferrer">阅读原文 →</a></article>';});
       cards+='</div>';
     }
     body+='<section class="block" id="sec-'+i+'"><div class="sec-head"><span class="ic">'+ICON[l]+'</span><h2>'+esc(l)+'</h2><span class="rule"></span><span class="badge" style="background:'+ACCENT[l]+'">'+items.length+' 条</span></div>'+cards+'</section>';
