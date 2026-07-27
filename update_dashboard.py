@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-财经三板块日报仪表盘（股市 / 金融 / 互联网）—— 每日自动更新脚本（自包含）。
-流程：拉取 aihot 日报列表 -> 增量追加缺失日期到本地数据集 -> 重新生成单文件 HTML
+行业日报仪表盘（股市 / 金融 / 互联网）—— 每日自动更新脚本（自包含）。
+流程：抓取当日行业新闻 -> 整理入本地数据集 -> 重新生成单文件 HTML 仪表盘 -> 上传 GitHub 并推送邮件。
       -> 通过 GitHub Contents API 上传到仓库（带重试）。
 所有状态都保存在本脚本同目录（D:/ai-hot-daily-automation），不依赖任何会话目录。
 """
@@ -129,12 +129,12 @@ HTML = r"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>财经三板块日报仪表盘</title>
+<title>行业日报仪表盘</title>
 <style>
   :root{
-    --bg:#f6f7fb; --panel:#ffffff; --ink:#1f2330; --muted:#6b7280;
-    --line:#e8eaf0; --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.06);
-    --radius:16px;
+    --bg:#f3f4f8; --panel:#ffffff; --ink:#15171c; --muted:#6b7280;
+    --line:#e9ebf1; --shadow:0 1px 3px rgba(16,24,40,.05),0 14px 34px rgba(16,24,40,.09);
+    --radius:18px; --ac:#4f46e5;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -144,22 +144,23 @@ HTML = r"""<!DOCTYPE html>
   .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
 
   /* Hero */
-  .hero{background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 48%,#0ea5e9 100%);color:#fff;padding:34px 0 26px;position:relative;overflow:hidden}
+  .hero{background:linear-gradient(135deg,#3730a3 0%,#6d28d9 46%,#0ea5e9 100%);color:#fff;padding:40px 0 30px;position:relative;overflow:hidden}
   .hero::after{content:"";position:absolute;inset:0;background:
-    radial-gradient(600px 200px at 85% -10%,rgba(255,255,255,.18),transparent),
-    radial-gradient(400px 200px at 10% 120%,rgba(255,255,255,.12),transparent)}
+    radial-gradient(620px 240px at 88% -20%,rgba(255,255,255,.22),transparent),
+    radial-gradient(480px 260px at 6% 130%,rgba(255,255,255,.14),transparent)}
   .hero .wrap{position:relative;z-index:1}
-  .eyebrow{font-size:13px;letter-spacing:.18em;text-transform:uppercase;opacity:.85;font-weight:600}
-  .hero h1{font-size:clamp(26px,4.6vw,42px);font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
-  .hero .meta{opacity:.92;font-size:14px;margin-top:6px}
+  .eyebrow{font-size:13px;letter-spacing:.2em;text-transform:uppercase;opacity:.9;font-weight:700}
+  .hero h1{font-size:clamp(28px,5vw,46px);font-weight:800;margin:8px 0 6px;letter-spacing:-.6px}
+  .hero .meta{opacity:.94;font-size:15px;margin-top:8px}
   .hero .meta b{font-weight:700}
-  .stats{display:grid;grid-template-columns:1.1fr repeat(5,1fr);gap:12px;margin-top:22px}
-  .stat{background:rgba(255,255,255,.14);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.22);
-    border-radius:14px;padding:14px 12px;text-align:center}
-  .stat.total .num{font-size:40px}
+  .stats{display:grid;grid-template-columns:1.1fr repeat(5,1fr);gap:12px;margin-top:24px}
+  .stat{background:rgba(255,255,255,.16);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.28);
+    border-radius:16px;padding:16px 12px;text-align:center;transition:transform .2s,background .2s}
+  .stat:hover{transform:translateY(-3px);background:rgba(255,255,255,.24)}
+  .stat.total .num{font-size:42px}
   .stat .num{font-size:30px;font-weight:800;line-height:1}
-  .stat .lbl{font-size:12px;opacity:.9;margin-top:6px;line-height:1.35}
-  .stat .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  .stat .lbl{font-size:12px;opacity:.92;margin-top:7px;line-height:1.35}
+  .stat .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle}
 
   /* Controls bar */
   .controls{position:sticky;top:0;z-index:25;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
@@ -206,12 +207,12 @@ HTML = r"""<!DOCTYPE html>
   .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
   .sec-head .ic{font-size:24px}
   .sec-head h2{font-size:21px;font-weight:800;letter-spacing:-.3px}
-  .sec-head .badge{margin-left:auto;font-size:13px;font-weight:700;color:#fff;border-radius:999px;padding:3px 12px}
+  .sec-head .badge{margin-left:auto;font-size:13px;font-weight:700;color:#fff;border-radius:999px;padding:4px 14px;box-shadow:0 4px 12px rgba(16,24,40,.18)}
   .sec-head .rule{flex:1;height:1px;background:var(--line)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;
-    box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;transition:transform .15s,box-shadow .15s}
-  .card:hover{transform:translateY(-3px);box-shadow:0 4px 10px rgba(16,24,40,.06),0 16px 36px rgba(16,24,40,.10)}
+  .card{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--ac,#4f46e5);border-radius:var(--radius);padding:18px 20px;
+    box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;transition:transform .18s,box-shadow .18s}
+  .card:hover{transform:translateY(-4px);box-shadow:0 6px 14px rgba(16,24,40,.07),0 22px 46px rgba(16,24,40,.13)}
   .card .top{display:flex;align-items:center;gap:10px}
   .num{flex:0 0 auto;width:30px;height:30px;border-radius:9px;color:#fff;font-weight:800;font-size:14px;
     display:flex;align-items:center;justify-content:center}
@@ -241,7 +242,7 @@ HTML = r"""<!DOCTYPE html>
 </head>
 <body>
   <header class="hero"><div class="wrap">
-    <div class="eyebrow">财经日报 · 每日 / 每周 / 每月（股市 / 金融 / 互联网）</div>
+    <div class="eyebrow">行业日报 · 每日 / 每周 / 每月（股市 / 金融 / 互联网）</div>
     <h1 id="hTitle">—</h1>
     <div class="meta" id="hMeta">—</div>
     <div class="stats" id="stats"></div>
@@ -301,7 +302,7 @@ function getView(){
   if(state.mode==="day"){
     const d=state.cursor, day=DB.days[d];
     const s = day?day.s:emptySections();
-    return {title:fmtCn(d)+" "+wkCN(d), sub:"当日 AI HOT 精选日报", secs:s,
+    return {title:fmtCn(d)+" "+wkCN(d), sub:"当日行业精选日报", secs:s,
             leads: (day&&day.lead)?[day.lead]:[], total:count(s), kind:"day"};
   }
   if(state.mode==="week"){
@@ -317,7 +318,7 @@ function getView(){
   const ds=DATES.filter(d=>d.startsWith(pfx));
   const m=merge(ds);
   const leads=ds.map(dd=>DB.days[dd].lead).filter(Boolean);
-  return {title:y+"年"+mo+"月", sub:"本月共 "+ds.length+" 期日报精选合集", secs:m, leads, total:count(m), kind:"month"};
+  return {title:y+"年"+mo+"月", sub:"本月共 "+ds.length+" 期行业日报精选合集", secs:m, leads, total:count(m), kind:"month"};
 }
 
 /* ---- render ---- */
@@ -343,14 +344,14 @@ function render(){
     if(!items.length){cards='<div class="empty">本版块本期暂无条目</div>';}
     else{
       cards='<div class="grid">';
-      items.forEach(it=>{cards+='<article class="card"><div class="top"><span class="num" style="background:'+ACCENT[l]+'">'+it.n+'</span><span class="chip" title="'+esc(it.src)+'">'+esc(it.src)+'</span></div><h3>'+esc(it.t)+'</h3>'+(it.s?'<p>'+esc(it.s)+'</p>':'')+'<a class="go" style="color:'+ACCENT[l]+'" href="'+esc(it.u)+'" target="_blank" rel="noopener noreferrer">阅读原文 →</a></article>';});
+      items.forEach(it=>{cards+='<article class="card" style="--ac:'+ACCENT[l]+'"><div class="top"><span class="num" style="background:'+ACCENT[l]+'">'+it.n+'</span><span class="chip" title="'+esc(it.src)+'">'+esc(it.src)+'</span></div><h3>'+esc(it.t)+'</h3>'+(it.s?'<p>'+esc(it.s)+'</p>':'')+'<a class="go" style="color:'+ACCENT[l]+'" href="'+esc(it.u)+'" target="_blank" rel="noopener noreferrer">阅读原文 →</a></article>';});
       cards+='</div>';
     }
     body+='<section class="block" id="sec-'+i+'"><div class="sec-head"><span class="ic">'+ICON[l]+'</span><h2>'+esc(l)+'</h2><span class="rule"></span><span class="badge" style="background:'+ACCENT[l]+'">'+items.length+' 条</span></div>'+cards+'</section>';
   });
   document.getElementById("main").innerHTML=body;
   document.getElementById("footTotal").textContent=v.total;
-  document.getElementById("footSrc").textContent="权威财经媒体 / 交易所 / 监管机构 多元聚合";
+  document.getElementById("footSrc").textContent="权威行业媒体 / 交易所 / 监管机构 多元聚合";
   document.getElementById("footCov").textContent="数据覆盖 "+DB.start+" ~ "+DB.end+"（共 "+DATES.length+" 期日报，已内嵌）";
   initObserver();
 }
@@ -495,7 +496,7 @@ def _daily(today, db):
     for s in secs:
         secs[s] = _dedupe(secs[s])[:6]
     label = (ds[0] + " ~ " + ds[-1]) if ds else today.isoformat()
-    return {"type": "daily", "name": "财经日报", "header": "今日财经看点", "date_label": label, "secs": secs}
+    return {"type": "daily", "name": "行业日报", "header": "今日行业看点", "date_label": label, "secs": secs}
 
 
 def _weekly(today, db):
@@ -510,7 +511,7 @@ def _weekly(today, db):
     for s in agg:
         agg[s] = _dedupe(agg[s])[:6]
     label = (ds[0] + " ~ " + ds[-1]) if ds else ""
-    return {"type": "weekly", "name": "财经周报", "header": "上周财经看点", "date_label": label, "secs": agg}
+    return {"type": "weekly", "name": "行业周报", "header": "上周行业看点", "date_label": label, "secs": agg}
 
 
 def _monthly(today, db):
@@ -524,7 +525,7 @@ def _monthly(today, db):
                     agg[s].append(it["t"])
     for s in agg:
         agg[s] = _dedupe(agg[s])[:6]
-    return {"type": "monthly", "name": "财经月报", "header": "上月财经看点", "date_label": ym, "secs": agg}
+    return {"type": "monthly", "name": "行业月报", "header": "上月行业看点", "date_label": ym, "secs": agg}
 
 
 def make_report(today, db):
@@ -550,19 +551,29 @@ def build_mail_html(name, report):
         lines = "".join("· " + esc_html(t) + "<br>" for t in items)
         sec_html += ('<p style="margin:0 0 10px;"><strong style="color:#374151;">'
                      + esc_html(sec) + "</strong><br>" + lines + "</p>")
-    subj_kind = {"daily": "今天的财经日报", "weekly": "上周的财经周报",
-                 "monthly": "上月的财经月报"}[report["type"]]
+    subj_kind = {"daily": "今天的行业日报", "weekly": "上周的行业周报",
+                 "monthly": "上月的行业月报"}[report["type"]]
     return ('<p style="font-size:15px;line-height:1.7;color:#222;">' + esc_html(name)
             + "早上好，" + subj_kind + "来啦，请您查收。</p>\n"
             '<p><a href="' + LINK + '" style="color:#2563eb;font-size:15px;font-weight:600;">'
-            "👉 点击查看：AI HOT 晨报仪表盘</a></p>\n"
+            "👉 点击查看：行业日报仪表盘</a></p>\n"
             '<p style="margin:14px 0 6px;font-size:14px;font-weight:700;color:#111;">📌 '
             + esc_html(report["header"]) + "（" + esc_html(report["date_label"]) + "）</p>\n"
             + sec_html
             + '<p style="font-size:13px;color:#888;margin-top:14px;">用浏览器打开上方蓝色链接即可查看当日及历史日报，支持日报 / 周报 / 月报切换。</p>')
 
 
-def send_mail(to_addr, name, report):
+# 收件人配置：mode="std" 沿用原标题格式；mode="linjie" 使用个性化标题（林杰专属）
+RECEIVERS = [
+    {"to": "3529083364@qq.com",     "name": "小陶", "mode": "std"},
+    {"to": "2750214411@qq.com",     "name": "永川", "mode": "std"},
+    {"to": "wanlinjie0913@163.com", "name": "林杰", "mode": "linjie"},
+]
+# 本报告在邮件中的称呼（林杰个性化标题使用）
+REPORT_LABEL = "行业日报"
+
+
+def send_mail(to_addr, name, report, mode="std"):
     import smtplib
     from email.mime.text import MIMEText
     user = os.environ.get("QQ_SMTP_USER")
@@ -570,10 +581,13 @@ def send_mail(to_addr, name, report):
     if not user or not auth:
         print("  [mail] skip: QQ_SMTP_USER / QQ_SMTP_AUTH not set")
         return False
-    type2subj = {"daily": "今天的财经日报来啦，请您查收",
-                 "weekly": "这是上周的财经周报，请您查收",
-                 "monthly": "这是上月的财经月报，请您查收"}
-    subject = "【" + name + "早上好，" + type2subj[report["type"]] + "】"
+    if mode == "linjie":
+        subject = "林杰早上好鸭，这是今日的 " + REPORT_LABEL + "，请查收"
+    else:
+        type2subj = {"daily": "今天的行业日报来啦，请您查收",
+                     "weekly": "这是上周的行业周报，请您查收",
+                     "monthly": "这是上月的行业月报，请您查收"}
+        subject = "【" + name + "早上好，" + type2subj[report["type"]] + "】"
     html = build_mail_html(name, report)
     msg = MIMEText(html, "html", "utf-8")
     msg["Subject"] = subject
@@ -592,10 +606,9 @@ def send_mail(to_addr, name, report):
 
 
 def send_all_reports(db):
-    receivers = [("3529083364@qq.com", "小陶"), ("2750214411@qq.com", "永川")]
-    for to, name in receivers:
+    for r in RECEIVERS:
         for report in make_report(date.today(), db):
-            send_mail(to, name, report)
+            send_mail(r["to"], r["name"], report, r.get("mode", "std"))
 
 
 def main():
@@ -611,28 +624,45 @@ def main():
     today = date.today().strftime("%Y-%m-%d")
     print("[2] today:", today)
 
-    # 读取由 agent 抓取的当日财经数据（db_slim 当日格式）
+    # 读取由 agent 抓取的当日行业数据（db_slim 当日格式）
     daily_path = os.path.join(HERE, "daily_caijing.json")
     added = 0
-    if os.path.exists(daily_path):
+    skip_reason = None
+
+    def day_has_content(slim):
+        return any((slim.get("s", {}) or {}).get(sec) for sec in SECTION_ORDER)
+
+    if not os.path.exists(daily_path):
+        skip_reason = "daily_caijing.json 不存在，今天没有可收录的新闻"
+    else:
         try:
             with open(daily_path, encoding="utf-8") as f:
                 day_data = json.load(f)
             d = day_data.get("date") or today
-            slim = {"lead": day_data.get("lead"), "s": {}}
-            for sec in SECTION_ORDER:
-                slim["s"][sec] = [
-                    {"t": it.get("t", ""), "s": trunc(it.get("s", "")),
-                     "src": clean_source(it.get("src", "")), "u": it.get("u", "#")}
-                    for it in day_data.get("s", {}).get(sec, [])
-                ]
-            db["days"][d] = slim
-            added += 1
-            print("    + added", d)
+            # 日期护栏：只收录当天（最近一天）的新闻，过期/缺失则跳过，避免滞后数据
+            if d != today:
+                skip_reason = "抓取日期 %s ≠ 今天 %s，疑似滞后数据，已跳过" % (d, today)
+            else:
+                slim = {"lead": day_data.get("lead"), "s": {}}
+                for sec in SECTION_ORDER:
+                    slim["s"][sec] = [
+                        {"t": it.get("t", ""), "s": trunc(it.get("s", "")),
+                         "src": clean_source(it.get("src", "")), "u": it.get("u", "#")}
+                        for it in day_data.get("s", {}).get(sec, [])
+                    ]
+                if not day_has_content(slim):
+                    skip_reason = "今天各板块均无有效新闻条目，跳过收录"
+                else:
+                    db["days"][d] = slim
+                    added += 1
+                    print("    + added", d)
         except Exception as e:
-            print("    - skip daily_caijing.json:", repr(e)[:80])
-    else:
-        print("    [warn] daily_caijing.json not found, no new data today")
+            skip_reason = "daily_caijing.json 解析失败: " + repr(e)[:60]
+
+    if skip_reason:
+        print("    [skip] " + skip_reason)
+        print("    [skip] 今天不更新仪表盘、也不推送邮件（避免发送滞后/空数据）")
+        return
 
     # trim to most recent MAX_KEEP
     all_dates = sorted(db["days"].keys())
