@@ -6,9 +6,9 @@
 <title>财经三板块日报仪表盘</title>
 <style>
   :root{
-    --bg:#f3f4f8; --panel:#ffffff; --ink:#15171c; --muted:#6b7280;
-    --line:#e9ebf1; --shadow:0 1px 3px rgba(16,24,40,.05),0 14px 34px rgba(16,24,40,.09);
-    --radius:18px; --ac:#4f46e5;
+    --bg:#f6f7fb; --panel:#ffffff; --ink:#1f2330; --muted:#6b7280;
+    --line:#e8eaf0; --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.06);
+    --radius:16px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -18,23 +18,22 @@
   .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
 
   /* Hero */
-  .hero{background:linear-gradient(135deg,#3730a3 0%,#6d28d9 46%,#0ea5e9 100%);color:#fff;padding:40px 0 30px;position:relative;overflow:hidden}
+  .hero{background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 48%,#0ea5e9 100%);color:#fff;padding:34px 0 26px;position:relative;overflow:hidden}
   .hero::after{content:"";position:absolute;inset:0;background:
-    radial-gradient(620px 240px at 88% -20%,rgba(255,255,255,.22),transparent),
-    radial-gradient(480px 260px at 6% 130%,rgba(255,255,255,.14),transparent)}
+    radial-gradient(600px 200px at 85% -10%,rgba(255,255,255,.18),transparent),
+    radial-gradient(400px 200px at 10% 120%,rgba(255,255,255,.12),transparent)}
   .hero .wrap{position:relative;z-index:1}
-  .eyebrow{font-size:13px;letter-spacing:.2em;text-transform:uppercase;opacity:.9;font-weight:700}
-  .hero h1{font-size:clamp(28px,5vw,46px);font-weight:800;margin:8px 0 6px;letter-spacing:-.6px}
-  .hero .meta{opacity:.94;font-size:15px;margin-top:8px}
+  .eyebrow{font-size:13px;letter-spacing:.18em;text-transform:uppercase;opacity:.85;font-weight:600}
+  .hero h1{font-size:clamp(26px,4.6vw,42px);font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
+  .hero .meta{opacity:.92;font-size:14px;margin-top:6px}
   .hero .meta b{font-weight:700}
-  .stats{display:grid;grid-template-columns:1.1fr repeat(5,1fr);gap:12px;margin-top:24px}
-  .stat{background:rgba(255,255,255,.16);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.28);
-    border-radius:16px;padding:16px 12px;text-align:center;transition:transform .2s,background .2s}
-  .stat:hover{transform:translateY(-3px);background:rgba(255,255,255,.24)}
-  .stat.total .num{font-size:42px}
+  .stats{display:grid;grid-template-columns:1.1fr repeat(5,1fr);gap:12px;margin-top:22px}
+  .stat{background:rgba(255,255,255,.14);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.22);
+    border-radius:14px;padding:14px 12px;text-align:center}
+  .stat.total .num{font-size:40px}
   .stat .num{font-size:30px;font-weight:800;line-height:1}
-  .stat .lbl{font-size:12px;opacity:.92;margin-top:7px;line-height:1.35}
-  .stat .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  .stat .lbl{font-size:12px;opacity:.9;margin-top:6px;line-height:1.35}
+  .stat .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
 
   /* Controls bar */
   .controls{position:sticky;top:0;z-index:25;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
@@ -81,12 +80,12 @@
   .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
   .sec-head .ic{font-size:24px}
   .sec-head h2{font-size:21px;font-weight:800;letter-spacing:-.3px}
-  .sec-head .badge{margin-left:auto;font-size:13px;font-weight:700;color:#fff;border-radius:999px;padding:4px 14px;box-shadow:0 4px 12px rgba(16,24,40,.18)}
+  .sec-head .badge{margin-left:auto;font-size:13px;font-weight:700;color:#fff;border-radius:999px;padding:3px 12px}
   .sec-head .rule{flex:1;height:1px;background:var(--line)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-  .card{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--ac,#4f46e5);border-radius:var(--radius);padding:18px 20px;
-    box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;transition:transform .18s,box-shadow .18s}
-  .card:hover{transform:translateY(-4px);box-shadow:0 6px 14px rgba(16,24,40,.07),0 22px 46px rgba(16,24,40,.13)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;
+    box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;transition:transform .15s,box-shadow .15s}
+  .card:hover{transform:translateY(-3px);box-shadow:0 4px 10px rgba(16,24,40,.06),0 16px 36px rgba(16,24,40,.10)}
   .card .top{display:flex;align-items:center;gap:10px}
   .num{flex:0 0 auto;width:30px;height:30px;border-radius:9px;color:#fff;font-weight:800;font-size:14px;
     display:flex;align-items:center;justify-content:center}
@@ -144,7 +143,7 @@
   <button id="top" title="返回顶部">↑</button>
 
 <script>
-const DB = {"start":"2026-07-26","end":"2026-07-26","days":{"2026-07-26":{"lead":{"t":"今日市场焦点：2.1万亿逆回购预告维稳资金面，宁德时代抛A股史上最大注销式回购","p":"央行预告7月末至8月初合计2.1万亿逆回购对冲缴款压力；宁德时代中报净利+42%并抛出200-400亿注销式回购；主要指数上周集体调整。"},"s":{"股市":[{"t":"央行预告7月29-31日每日6000亿逆回购 合计2.1万亿","s":"对冲月末地方债与特别国债缴款压力，资金面'适度宽松'定调不变，利好大金融与成长股","src":"市场消息汇总","u":"https://baijiahao.baidu.com/s?id=1871757659284182228"},{"t":"宁德时代抛200-400亿注销式回购 A股史上最大单次","s":"中报净利+42%，叠加中期分红65亿，全部注销式回购","src":"市场消息汇总","u":"https://baijiahao.baidu.com/s?id=1871757659284182228"},{"t":"上周全球市场调整 上证指数收3814.20跌1.61%","s":"深证成指跌2.47%、创业板指跌2.65%、沪深300跌1.67%、恒生指数跌0.98%","src":"中国网财经","u":"http://finance.china.com.cn/"},{"t":"锂电池核心添加剂价格1月涨超4成","s":"今年市场规模预计增长51%，相关产业链受关注","src":"东方财富","u":"https://stock.eastmoney.com/a/cscsj.html"},{"t":"台风'红霞'登陆广东 多部门支持灾后应急恢复","s":"相关部门出台措施支持广东台风灾害灾后应急恢复","src":"东方财富","u":"https://finance.eastmoney.com/?category=10007"}],"金融":[{"t":"央行7月24日开展5000亿元MLF操作 加量1000亿","s":"连续第三个月加量续作，叠加买断式逆回购，当月中期流动性操作合计放量","src":"新浪财经","u":"https://finance.sina.com.cn/roll/2026-07-25/doc-iniizkxf1080121.shtml"},{"t":"央行明确持续实施适度宽松货币政策","s":"加大逆周期、跨周期调节，保持流动性充裕，灵活运用逆回购、MLF、降准工具","src":"新浪财经","u":"https://k.sina.cn/article_7879776490_1d5abd8ea0680198a8.html"},{"t":"国新办发布会介绍上半年货币政策执行与金融统计数据","s":"央行副行长邹澜出席，解读上半年金融支持实体经济成效","src":"央广网","u":"https://news.cnr.cn/native/gd/20260715/t20260715_527711780.shtml"},{"t":"上半年货币政策支持实体经济效果明显","s":"金融统计数据反映社会综合融资成本稳中有降","src":"央广网","u":"https://news.cnr.cn/native/gd/20260715/t20260715_527711780.shtml"}],"互联网":[{"t":"OpenAI发布GPT-5.6（太阳系系列）模型","s":"并行多子Agent推理能力刷新行业榜单，但受海外监管政策限制","src":"雪球","u":"https://xueqiu.com/1077174092/399462752"},{"t":"谷歌发布Nano Banana 2 Lite（Gemini 3.1 Flash-Lite）图像模型","s":"轻量级图像生成模型面向更广场景落地","src":"雪球","u":"https://xueqiu.com/1077174092/397730375"},{"t":"国产万亿模型开源 AI智能体能力突破","s":"中国开源大模型以低成本+可微调优势反向渗透海外科技巨头基础设施","src":"CSDN","u":"https://blog.csdn.net/agito_cheung/article/details/162587564"},{"t":"Sapiens AI 核心全模态模型 Agnes AI 面向全球免费开放","s":"面向全球开发者和创作者无限期免费","src":"10100.com","u":"https://www.10100.com/article/149129791"},{"t":"国常会人工智能产业扶持政策落地 万卡级智算中心配套","s":"加大高端芯片、存储材料研发补贴与税收减免，开放政企场景","src":"无矩AI","u":"https://iaipie.com/2026-%E5%B9%B4-7-%E6%9C%88-1-%E6%97%A5-ai-%E8%A1%8C%E4%B8%9A%E8%B5%84%E8%AE%AF%E9%80%9F%E8%A7%88/"},{"t":"DeepSeek V4 与 Kimi K2.6 相继发布 国产大模型技术拐点","s":"2026年一季度国产大模型迎来历史性技术拐点，长上下文处理能力跃升","src":"腾讯云","u":"https://cloud.tencent.cn/developer/article/2672179"}]}}}};
+const DB = {"start":"2026-07-26","end":"2026-07-27","days":{"2026-07-26":{"lead":{"t":"今日市场焦点：2.1万亿逆回购预告维稳资金面，宁德时代抛A股史上最大注销式回购","p":"央行预告7月末至8月初合计2.1万亿逆回购对冲缴款压力；宁德时代中报净利+42%并抛出200-400亿注销式回购；主要指数上周集体调整。"},"s":{"股市":[{"t":"央行预告7月29-31日每日6000亿逆回购 合计2.1万亿","s":"对冲月末地方债与特别国债缴款压力，资金面'适度宽松'定调不变，利好大金融与成长股","src":"市场消息汇总","u":"https://baijiahao.baidu.com/s?id=1871757659284182228"},{"t":"宁德时代抛200-400亿注销式回购 A股史上最大单次","s":"中报净利+42%，叠加中期分红65亿，全部注销式回购","src":"市场消息汇总","u":"https://baijiahao.baidu.com/s?id=1871757659284182228"},{"t":"上周全球市场调整 上证指数收3814.20跌1.61%","s":"深证成指跌2.47%、创业板指跌2.65%、沪深300跌1.67%、恒生指数跌0.98%","src":"中国网财经","u":"http://finance.china.com.cn/"},{"t":"锂电池核心添加剂价格1月涨超4成","s":"今年市场规模预计增长51%，相关产业链受关注","src":"东方财富","u":"https://stock.eastmoney.com/a/cscsj.html"},{"t":"台风'红霞'登陆广东 多部门支持灾后应急恢复","s":"相关部门出台措施支持广东台风灾害灾后应急恢复","src":"东方财富","u":"https://finance.eastmoney.com/?category=10007"}],"金融":[{"t":"央行7月24日开展5000亿元MLF操作 加量1000亿","s":"连续第三个月加量续作，叠加买断式逆回购，当月中期流动性操作合计放量","src":"新浪财经","u":"https://finance.sina.com.cn/roll/2026-07-25/doc-iniizkxf1080121.shtml"},{"t":"央行明确持续实施适度宽松货币政策","s":"加大逆周期、跨周期调节，保持流动性充裕，灵活运用逆回购、MLF、降准工具","src":"新浪财经","u":"https://k.sina.cn/article_7879776490_1d5abd8ea0680198a8.html"},{"t":"国新办发布会介绍上半年货币政策执行与金融统计数据","s":"央行副行长邹澜出席，解读上半年金融支持实体经济成效","src":"央广网","u":"https://news.cnr.cn/native/gd/20260715/t20260715_527711780.shtml"},{"t":"上半年货币政策支持实体经济效果明显","s":"金融统计数据反映社会综合融资成本稳中有降","src":"央广网","u":"https://news.cnr.cn/native/gd/20260715/t20260715_527711780.shtml"}],"互联网":[{"t":"OpenAI发布GPT-5.6（太阳系系列）模型","s":"并行多子Agent推理能力刷新行业榜单，但受海外监管政策限制","src":"雪球","u":"https://xueqiu.com/1077174092/399462752"},{"t":"谷歌发布Nano Banana 2 Lite（Gemini 3.1 Flash-Lite）图像模型","s":"轻量级图像生成模型面向更广场景落地","src":"雪球","u":"https://xueqiu.com/1077174092/397730375"},{"t":"国产万亿模型开源 AI智能体能力突破","s":"中国开源大模型以低成本+可微调优势反向渗透海外科技巨头基础设施","src":"CSDN","u":"https://blog.csdn.net/agito_cheung/article/details/162587564"},{"t":"Sapiens AI 核心全模态模型 Agnes AI 面向全球免费开放","s":"面向全球开发者和创作者无限期免费","src":"10100.com","u":"https://www.10100.com/article/149129791"},{"t":"国常会人工智能产业扶持政策落地 万卡级智算中心配套","s":"加大高端芯片、存储材料研发补贴与税收减免，开放政企场景","src":"无矩AI","u":"https://iaipie.com/2026-%E5%B9%B4-7-%E6%9C%88-1-%E6%97%A5-ai-%E8%A1%8C%E4%B8%9A%E8%B5%84%E8%AE%AF%E9%80%9F%E8%A7%88/"},{"t":"DeepSeek V4 与 Kimi K2.6 相继发布 国产大模型技术拐点","s":"2026年一季度国产大模型迎来历史性技术拐点，长上下文处理能力跃升","src":"腾讯云","u":"https://cloud.tencent.cn/developer/article/2672179"}]}},"2026-07-27":{"lead":{"t":"长鑫科技今日科创板上市，两高内幕交易新规今日施行，国家队600亿增持稳市","p":"7月27日周一，A股迎来2026年最大IPO——国产DRAM龙头长鑫科技（688825）科创板挂牌，募资579亿元，对市场流动性形成虹吸考验；同日，最高人民法院、最高人民检察院修订的内幕交易、泄露内幕信息犯罪司法解释正式施行，剑指「关键少数」；央行7月24日开展5000亿元MLF操作净投放1000亿元；中国国新、中国诚通两大国资平台合计动用超600亿元增持央企股票，全力维护资本市场平稳运行。"},"s":{"股市":[{"t":"长鑫科技今日登陆科创板，2026年A股最大IPO募资579亿元","s":"国产DRAM龙头长鑫科技集团股份有限公司（股票代码688825）于7月27日在上交所科创板正式挂牌上市。发行价8.66…","src":"同花顺","u":"https://stock.10jqka.com.cn/20260723/c678390321.shtml"},{"t":"上周五A股黑色星期五：沪指跌1.61%，近5000只个股下跌","s":"7月24日A股三大指数集体重挫，上证指数跌1.61%报3814.20点，深证成指跌2.47%报13774.68点，创业…","src":"四川在线","u":"https://sichuan.scol.com.cn/ggxw/202607/83294418.html"},{"t":"7月25日A股收评：沪指跌0.33%，科创50逆势涨超2%","s":"7月25日（周六，按交易所补班安排）A股三大指数集体下跌，沪指跌0.33%，深成指跌0.22%，创业板指跌0.23%，…","src":"东方财富网","u":"https://caifuhao.eastmoney.com/news/20250725185919062570410"},{"t":"寒武纪大涨超12%领涨AI应用板块，张江高科涨停光刻机概念走高","s":"7月25日半导体板块午后走强，AI芯片龙头寒武纪大涨超12%，收报1225.00元；光刻机概念张江高科涨停，因赛集团等…","src":"东方财富网","u":"https://caifuhao.eastmoney.com/news/20250725150723793382450"},{"t":"中国诚通、中国国新两大国资平台合计增持超600亿元","s":"7月19日晚间，中国国新与中国诚通同步发布增持公告。中国国新旗下国新投资已使用股票回购增持专项再贷款及配套资金超500…","src":"新浪财经","u":"https://finance.sina.com.cn/wm/2026-07-26/doc-inikassr0629817.shtml"},{"t":"15家央企上市公司密集公告：增持、回购、分红提振市场信心","s":"7月20至21日，三峡能源、中国铝业等15家央企控股上市公司密集发布公告，通过股东增持、股份回购、现金分红等方式向市场…","src":"新浪财经","u":"https://finance.sina.com.cn/wm/2026-07-26/doc-inikassr0629817.shtml"},{"t":"7月24日收盘涨停42只跌停25只，兵装重组军工板块逆势活跃","s":"7月24日A股全天走弱，收盘涨停42只（部分口径52-53只）、跌停25只。连板高度压缩，长缆科技4板（电网）、爱丽家…","src":"东方财富网","u":"https://caifuhao.eastmoney.com/news/20260724152051886324530"},{"t":"机构预判7月27-31日收官周：向下空间有限，向上需等催化剂","s":"东方财富指出，外部风险偏好下行叠加长鑫科技上市引发流动性预期收紧，A股情绪降温。下周或延续磨底震荡格局，向下空间有限但…","src":"东方财富网","u":"https://finance.eastmoney.com/a/202607243820812227.html"},{"t":"长鑫科技IPO重塑A股科技估值与产业格局，三重市场博弈聚焦","s":"作为2026年A股最大IPO、科创板史上核心硬核资产之一，长鑫科技上市被视为国内存储芯片产业国产化、周期反转、估值重构…","src":"每日经济新闻","u":"https://www.nbd.com.cn/articles/2026-07-26/4512151.html"},{"t":"7月25日两市融资余额19357.35亿元，反映杠杆资金观望情绪","s":"截至7月24日，两市融资余额合计19357.35亿元，较前一交易日有所回落，反映杠杆资金在长鑫科技上市前夕的观望情绪。…","src":"证券时报","u":"https://www.stcn.com/live/video-detail/24498.html"}],"金融":[{"t":"两高内幕交易司法解释今日施行：实控人大股东违法成本显著抬升","s":"最高人民法院、最高人民检察院联合发布的《关于修改〈关于办理内幕交易、泄露内幕信息刑事案件具体应用法律若干问题的解释〉的…","src":"千龙网","u":"https://china.qianlong.com/2026/0727/8703019.shtml"},{"t":"内幕信息敏感期前移至\"初步意向透露时\"，斩断关键少数套利链条","s":"新规在《解释》第五条新增\"控股股东、实际控制人或相关决策人员向关系密切人员透露形成内幕信息初步意向的时间，应当视为动议…","src":"科技日报","u":"https://www.stdaily.com/web/gdxw/2026-07/25/content_553514.html"},{"t":"基础入罪门槛一升一降：成交额50万升至200万，特殊主体100万即可入罪","s":"一般内幕交易\"情节严重\"认定标准由成交额50万元提升至200万元，获利/避险额由15万元提升至50万元；但对内幕信息知…","src":"千龙网","u":"https://china.qianlong.com/2026/0727/8703019.shtml"},{"t":"央行7月24日开展5000亿元MLF操作，净投放1000亿元","s":"中国人民银行7月23日发布2026年7月中期借贷便利（MLF）招标公告，7月24日以固定数量、利率招标、多重价位中标方…","src":"证券日报","u":"http://epaper.zqrb.cn/html/2026-07/24/content_1260945.htm"},{"t":"7月LPR连续14个月按兵不动：1年期3.0%，5年期以上3.5%","s":"7月20日中国人民银行授权全国银行间同业拆借中心公布新版LPR报价：1年期3.0%、5年期以上3.5%，均与上月持平，…","src":"北京经济信息网","u":"http://www.beinet.net.cn/jjyw/hgjj/202607/t14461041.html"},{"t":"东方金诚：央行有望三季度末前后实施政策性降息10个基点","s":"机构研判下半年央行有可能实施政策性降息，将带动LPR报价跟进下调。逻辑在于：伴随高油价对全球经济拖累效应显现、出口增速…","src":"北京经济信息网","u":"http://www.beinet.net.cn/jjyw/hgjj/202607/t14461041.html"},{"t":"外汇局：6月末外汇储备34163亿美元，涉外收支规模创历史新高","s":"国家外汇管理局7月17日发布，上半年银行代客涉外收入和支出合计9.2万亿美元，同比增长21%，规模为历史同期新高；人民…","src":"国家外汇管理局","u":"https://www.safe.gov.cn/safe/2026/0717/27705.html"},{"t":"外汇局将发新一轮QDII额度，向公募产品倾斜提升普惠水平","s":"外汇局资本项目管理司司长肖胜在7月17日发布会上表示，近期正抓紧推进新一轮QDII额度发放准备工作，争取尽快发放，更好…","src":"国家外汇管理局","u":"https://www.safe.gov.cn/safe/2026/0717/27705.html"},{"t":"外资来华投资向好：前5月净增加约1600亿美元，高技术外资流入同比增61%","s":"国际收支数据显示，前5个月外资来华各类投资净增加约1600亿美元，明显好于去年同期。外商来华股权投资净增加500多亿美…","src":"国家外汇管理局","u":"https://www.safe.gov.cn/safe/2026/0717/27705.html"},{"t":"金融监管总局出新规：2026年起保险许可证取消，统一换领金融许可证","s":"金融监管总局近日正式发布修订后的《银行保险机构许可证管理办法》，新规将于2026年6月1日起全面实施。保险许可证取消，…","src":"新浪财经","u":"https://finance.sina.com.cn/money/insurance/bxdt/2026-07-01/doc-inifiaew3014237.shtml"},{"t":"三大保险巨头集体发声，太平资产因险资运用不规范被处罚","s":"7月20日至21日，中国人保、中国太保、中国平安三大保险集团先后发布公告或声明，就公司经营状况、市场前景及股东回报做出…","src":"搜狐","u":"https://www.sohu.com/a/1052961952_122931229"}],"互联网":[{"t":"2026世界人工智能大会闭幕：意向采购203.6亿，签约409亿，10万人形机器人量产预期","s":"7月17-20日，2026世界人工智能大会暨人工智能全球治理高级别会议在上海举办，102个国家和国际组织参会，到场中外…","src":"新华网","u":"http://www.xinhuanet.com/liangzi/20260721/65a0a7dc926b4cb3b3f6a4db09574c49/c.html"},{"t":"习近平出席WAIC开幕式并发表主旨讲话，国资央企推进AI+专项行动","s":"国家主席习近平出席2026世界人工智能大会暨人工智能全球治理高级别会议开幕式并发表主旨讲话。7月20日国务院国资委党委…","src":"上海市政府","u":"https://www.shanghai.gov.cn/nw4411/20260721/b964a0614c41408ea1d916a8fd211761.html"},{"t":"苹果AI国行版完成备案，阿里千问接入iPhone，百度打辅助","s":"7月15日网信中国公布7款手机端侧生成式AI服务备案清单，苹果技术开发（上海）有限公司的「Apple智能」赫然在列，备…","src":"腾讯新闻","u":"https://news.qq.com/rain/a/20260716A0462R00"},{"t":"工信部：今年中国人形机器人整机产量有望突破10万台，智元率先交付15000台","s":"工信部预计2026年中国人形机器人整机产量突破10万台，智元机器人率先完成15000台交付，产业从「炫技」进入「实干」…","src":"搜狐","u":"https://www.sohu.com/a/1051474191_122932404"},{"t":"蚂蚁国际完成约12亿美元A轮融资，加速AI与跨境支付全球布局","s":"7月21日，蚂蚁集团旗下独立运营的海外子公司蚂蚁国际（Ant International）宣布完成A轮股权融资约12亿…","src":"新京报","u":"https://www.bjnews.com.cn/detail/1784612666189900.html"},{"t":"《中国互联网发展报告2026》发布：智算经济规模预计突破30万亿占GDP超20%","s":"在2026（第二十五届）中国互联网大会闭幕式上，《中国互联网发展报告2026》正式发布。《报告》指出AI智能体数量将超…","src":"湖南省工信厅","u":"http://gxt.hunan.gov.cn/gxt/xxgk_71033/gzdt/rdjj/202607/t20260713_34025051.html"},{"t":"工信部发布上半年工业经济情况：深化脑机接口、具身智能、5G-A/6G融合","s":"工信部7月20日发布2026年上半年工业和信息化发展情况。规模以上高技术制造业增加值同比增长13.3%，比2025年加…","src":"工业和信息化部","u":"https://www.miit.gov.cn/xwfb/bldhd/art/2026/art_bc4cf76777cb4fd2896082ca2ff7039d.html"},{"t":"OpenAI完成122亿美元融资估值8520亿美元，Anthropic估值反超","s":"3月31日OpenAI宣布完成史上最大私募融资122亿美元，估值达8520亿美元。5月29日Anthropic宣布新一…","src":"CNBC","u":"https://www.cnbc.com/2026/05/28/anthropic-open-ai-startup-value.html"},{"t":"OpenAI服务7月25日大故障：API、ChatGPT、Codex同时受影响","s":"2026年7月25日，OpenAI多项服务出现错误率升高，包括API、ChatGPT和Codex，影响范围涉及31项服…","src":"36氪","u":"https://so.html5.qq.com/page/real/search_news?docid=70000021_7416a65837d89152"},{"t":"国产化工业互联网平台落地核工业，长三乙成功发射天链二号06星","s":"7月23日，中核集团核动力院下属中核控制自主研发的龙赑®全国产化工业互联网平台成功落地应用，是我国首个面向核工业高安全…","src":"新浪财经","u":"https://finance.sina.com.cn/wm/2026-07-26/doc-inikassr0629817.shtml"},{"t":"腾讯云WorkBuddy与李未可科技发布X-AI记忆眼镜，AI硬件生态加速","s":"7月17日WAIC期间，腾讯云WorkBuddy与李未可科技宣布达成战略生态合作，并发布首款接入WorkBuddy的X…","src":"36氪","u":"http://36kr.com/newsflashes/"}]}}}};
 const SECTIONS = ["股市","金融","互联网"];
 const ICON = {"股市":"📈","金融":"🏦","互联网":"💻"};
 const ACCENT = {"股市":"#e11d48","金融":"#059669","互联网":"#2563eb"};
@@ -176,7 +175,7 @@ function getView(){
   if(state.mode==="day"){
     const d=state.cursor, day=DB.days[d];
     const s = day?day.s:emptySections();
-    return {title:fmtCn(d)+" "+wkCN(d), sub:"当日财经精选日报", secs:s,
+    return {title:fmtCn(d)+" "+wkCN(d), sub:"当日 AI HOT 精选日报", secs:s,
             leads: (day&&day.lead)?[day.lead]:[], total:count(s), kind:"day"};
   }
   if(state.mode==="week"){
@@ -218,7 +217,7 @@ function render(){
     if(!items.length){cards='<div class="empty">本版块本期暂无条目</div>';}
     else{
       cards='<div class="grid">';
-      items.forEach(it=>{cards+='<article class="card" style="--ac:'+ACCENT[l]+'"><div class="top"><span class="num" style="background:'+ACCENT[l]+'">'+it.n+'</span><span class="chip" title="'+esc(it.src)+'">'+esc(it.src)+'</span></div><h3>'+esc(it.t)+'</h3>'+(it.s?'<p>'+esc(it.s)+'</p>':'')+'<a class="go" style="color:'+ACCENT[l]+'" href="'+esc(it.u)+'" target="_blank" rel="noopener noreferrer">阅读原文 →</a></article>';});
+      items.forEach(it=>{cards+='<article class="card"><div class="top"><span class="num" style="background:'+ACCENT[l]+'">'+it.n+'</span><span class="chip" title="'+esc(it.src)+'">'+esc(it.src)+'</span></div><h3>'+esc(it.t)+'</h3>'+(it.s?'<p>'+esc(it.s)+'</p>':'')+'<a class="go" style="color:'+ACCENT[l]+'" href="'+esc(it.u)+'" target="_blank" rel="noopener noreferrer">阅读原文 →</a></article>';});
       cards+='</div>';
     }
     body+='<section class="block" id="sec-'+i+'"><div class="sec-head"><span class="ic">'+ICON[l]+'</span><h2>'+esc(l)+'</h2><span class="rule"></span><span class="badge" style="background:'+ACCENT[l]+'">'+items.length+' 条</span></div>'+cards+'</section>';
