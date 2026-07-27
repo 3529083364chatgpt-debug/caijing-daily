@@ -569,8 +569,12 @@ RECEIVERS = [
     {"to": "2750214411@qq.com",     "name": "永川", "mode": "std"},
     {"to": "wanlinjie0913@163.com", "name": "林杰", "mode": "linjie"},
 ]
-# 本报告在邮件中的称呼（林杰个性化标题使用）
-REPORT_LABEL = "行业日报"
+# 林杰个性化标题：按报告类型切换「时段词 + 报告名」
+LINJIE_LABELS = {
+    "daily": ("今日的", "行业日报"),
+    "weekly": ("上周的", "行业周报"),
+    "monthly": ("上月的", "行业月报"),
+}
 
 
 def send_mail(to_addr, name, report, mode="std"):
@@ -582,7 +586,8 @@ def send_mail(to_addr, name, report, mode="std"):
         print("  [mail] skip: QQ_SMTP_USER / QQ_SMTP_AUTH not set")
         return False
     if mode == "linjie":
-        subject = "林杰早上好鸭，这是今日的 " + REPORT_LABEL + "，请查收"
+        tw, lb = LINJIE_LABELS[report["type"]]
+        subject = "林杰早上好鸭，这是" + tw + lb + "，请查收"
     else:
         type2subj = {"daily": "今天的行业日报来啦，请您查收",
                      "weekly": "这是上周的行业周报，请您查收",
